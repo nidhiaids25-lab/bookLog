@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Library System | Intelligent OOP & Full-Stack Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="brand" id="brandLogoBtn">
+                <div class="brand-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        <line x1="9" y1="7" x2="15" y2="7"></line>
+                        <line x1="9" y1="11" x2="13" y2="11"></line>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-title">Smart Library System</span>
+                    <span class="brand-subtitle">OOP Architecture & Management System</span>
+                </div>
+            </div>
+
+            <!-- Server & Storage Status Indicator -->
+            <div class="nav-center">
+                <div class="status-badge" id="serverStatusBadge" title="Server Connection Health">
+                    <span class="pulse-dot"></span>
+                    <span id="serverStatusText">System Live</span>
+                </div>
+                <div class="db-mode-badge" id="dbModeBadge" title="Click to toggle In-Memory / MySQL storage">
+                    <span id="dbModeIcon">💾</span>
+                    <span id="dbModeText">In-Memory Mode</span>
+                </div>
+            </div>
+
+            <!-- User Profile & Action Area -->
+            <div class="nav-actions">
+                <div class="role-switcher-dropdown">
+                    <button class="user-dropdown-toggle" id="userDropdownBtn">
+                        <div class="user-avatar admin-avatar" id="navUserAvatar">A</div>
+                        <div class="user-meta">
+                            <span class="user-name" id="navUserName">System Administrator</span>
+                            <span class="role-tag role-admin" id="navUserRole">ADMIN</span>
+                        </div>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div class="dropdown-menu hidden" id="userDropdownMenu">
+                        <div class="dropdown-header">Current Session</div>
+                        <div style="padding: 0.5rem 0.85rem; font-size: 0.82rem; color: var(--text-muted);">
+                            Active ID: <strong id="menuCurrentUserId" style="color: var(--text-main);">admin</strong>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" id="switchRootAdminBtn">
+                            <span>👑</span>
+                            <div><strong>Sign in as Admin</strong> <small class="text-muted">(admin / admin123)</small></div>
+                        </button>
+                        <button class="dropdown-item" id="openAuthModalFromDropdown">
+                            <span>🔑</span>
+                            <div><strong>Sign in with Reader ID</strong></div>
+                        </button>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item text-danger" id="logoutDropdownBtn">
+                            <span>🚪</span>
+                            <div>Sign Out</div>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-sm" id="headerActionAddBookBtn">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    + Add Book
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-wrapper">
+
+        <!-- KPI Metrics & Analytics Grid -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-blue">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-val" id="kpiTotalBooks">0</span>
+                    <span class="stat-lbl">Total Catalog Books</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-green">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-val" id="kpiAvailableBooks">0</span>
+                    <span class="stat-lbl">Available Copies</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-amber">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-val" id="kpiActiveLoans">0</span>
+                    <span class="stat-lbl">Active Rented Loans</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-purple">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-val" id="kpiDigitalMedia">0</span>
+                    <span class="stat-lbl">Digital & AudioBooks</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-cyan">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-val" id="kpiRevenue">₹0</span>
+                    <span class="stat-lbl">Total Sales & Rentals</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation Tabs Bar -->
+        <div class="tabs-container">
+            <div class="tabs-list">
+                <button class="tab-btn active" data-tab="catalogTab">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    Book Catalog
+                </button>
+                <button class="tab-btn" data-tab="nearbyTab">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    Nearby Libraries
+                </button>
+                <button class="tab-btn" data-tab="myLoansTab">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    My Loans & Purchases
+                    <span class="tab-badge" id="myLoansCountBadge">0</span>
+                </button>
+                <button class="tab-btn" data-tab="myReservationsTab">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                    My Reservations
+                    <span class="tab-badge" id="myReservationsCountBadge">0</span>
+                </button>
+                <button class="tab-btn" data-tab="sellerTab" id="sellerTabBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    Librarian & Admin Desk
+                </button>
+            </div>
+            <div class="tabs-side">
+                <button class="btn btn-primary" id="openAddBookModalBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Add Book
+                </button>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             TAB 1: BOOK CATALOG EXPLORER
+             =================================================================== -->
+        <section id="catalogTab" class="tab-content active">
+            <!-- Search, Filters, and Sorting Toolbar -->
+            <div class="toolbar">
+                <div class="search-sort-group">
+                    <div class="search-box">
+                        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="searchInput" placeholder="Search by title, author, genre, or book ID..." autocomplete="off">
+                        <button id="clearSearchBtn" class="clear-search hidden">&times;</button>
+                    </div>
+
+                    <div class="sort-box">
+                        <select id="sortSelect" aria-label="Sort books">
+                            <option value="default">Sort: Default</option>
+                            <option value="title">Title (A - Z)</option>
+                            <option value="author">Author (A - Z)</option>
+                            <option value="price_asc">Buy Price: Low to High</option>
+                            <option value="price_desc">Buy Price: High to Low</option>
+                            <option value="rent_asc">Rental Rate: Low to High</option>
+                            <option value="rent_desc">Rental Rate: High to Low</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <button class="filter-pill active" data-filter="ALL">All Formats</button>
+                    <button class="filter-pill" data-filter="PHYSICAL">Physical Books (₹20/d)</button>
+                    <button class="filter-pill" data-filter="EBOOK">Digital E-Books (₹10/d)</button>
+                    <button class="filter-pill" data-filter="AUDIOBOOK">AudioBooks (₹15/d)</button>
+                    <button class="filter-pill" data-filter="AVAILABLE">Available Now</button>
+                </div>
+            </div>
+
+            <!-- Polymorphism Banner Info -->
+            <div class="info-callout">
+                <div class="callout-icon">💡</div>
+                <div class="callout-text">
+                    <strong>OOP Polymorphism & Dual Transaction Flow:</strong> Rent physical copies (₹20/day), E-Books (₹10/day), or AudioBooks (₹15/day). You can also <strong>permanently buy</strong> any book to add it forever to your personal collection!
+                </div>
+            </div>
+
+            <!-- Books Grid -->
+            <div class="books-grid" id="booksGrid">
+                <!-- Dynamically rendered via JavaScript -->
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state hidden" id="emptyCatalogState">
+                <div class="empty-icon">🔍</div>
+                <h3>No Matching Books Found</h3>
+                <p>Try clearing your search query or choosing another format filter.</p>
+                <button class="btn btn-outline btn-sm" id="resetCatalogFiltersBtn" style="margin-top: 0.75rem;">Reset Filters</button>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 2: NEARBY LIBRARIES (Day 3 Feature)
+             =================================================================== -->
+        <section id="nearbyTab" class="tab-content">
+            <div class="nearby-hero">
+                <div class="nearby-hero-text">
+                    <h2>📍 Nearby Branch Libraries & Centers</h2>
+                    <p>Find partner libraries in Delhi, Mumbai, Bengaluru, Pune, Hyderabad, and more. Filter by city or pincode and sort by distance.</p>
+                </div>
+                <div class="nearby-search-bar">
+                    <input type="text" id="nearbySearchInput" placeholder="Enter City (e.g. Delhi) or Pincode (e.g. 110001)...">
+                    <button class="btn btn-primary" id="nearbySearchBtn">Search</button>
+                </div>
+            </div>
+
+            <div class="libraries-grid" id="nearbyLibrariesGrid">
+                <!-- Dynamically rendered via JavaScript -->
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 3: MY LOANS & PURCHASES
+             =================================================================== -->
+        <section id="myLoansTab" class="tab-content">
+            <div class="section-header" style="margin-bottom: 1.5rem;">
+                <div>
+                    <h2>My Borrowed Books & Purchases</h2>
+                    <p class="section-desc" style="color: var(--text-muted); font-size: 0.9rem;">Track active rental loans, return borrowed books with receipt calculation, and view permanently purchased books.</p>
+                </div>
+            </div>
+
+            <div class="loans-container" id="myLoansList">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 4: MY RESERVATIONS (FIFO Queue)
+             =================================================================== -->
+        <section id="myReservationsTab" class="tab-content">
+            <div class="section-header" style="margin-bottom: 1.5rem;">
+                <div>
+                    <h2>Book Hold Queue & Reservations</h2>
+                    <p class="section-desc" style="color: var(--text-muted); font-size: 0.9rem;">Powered by strict FIFO Queue logic. When a loaned copy is returned by another user, the next reader in queue is automatically allocated the book!</p>
+                </div>
+            </div>
+
+            <div class="reservations-container" id="myReservationsList">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             TAB 5: LIBRARIAN & ADMIN DESK (Strict Account Architecture & Controls)
+             =================================================================== -->
+        <section id="sellerTab" class="tab-content">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h2>System Administration & Librarian Desk</h2>
+                    <p class="section-desc" style="color: var(--text-muted); font-size: 0.9rem;">Generate Reader credentials, manage book inventory, audit transaction histories, and inspect reservation queues.</p>
+                </div>
+                <div class="db-switch-container" style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Storage Mode:</span>
+                    <button class="btn btn-outline btn-sm" id="toggleDbBtn">
+                        Switch to MySQL Mode
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sub Navigation Tabs for Admin -->
+            <div class="admin-subtabs">
+                <button class="subtab-btn active" data-subtab="adminReaderGenTab">👤 Generate Reader Accounts</button>
+                <button class="subtab-btn" data-subtab="adminInventoryTab">📦 Book Inventory Management</button>
+                <button class="subtab-btn" data-subtab="adminAuditTab">📋 Audit Trail & Sales</button>
+                <button class="subtab-btn" data-subtab="adminReservationsTab">⏳ FIFO Reservation Queues</button>
+            </div>
+
+            <!-- Admin Subtab 1: Reader Account Generator (User Directive & Day 1) -->
+            <div id="adminReaderGenTab" class="admin-subtab-content active">
+                <div class="reader-gen-grid">
+                    <!-- Generator Form -->
+                    <div class="panel-card">
+                        <h3 class="panel-title">Generate Reader Account</h3>
+                        <p class="panel-desc">Only the Administrator can create Reader accounts. Credentials generated here can be used by readers to log into their profiles.</p>
+
+                        <form id="adminCreateReaderForm">
+                            <div class="form-group">
+                                <label for="genReaderName">Reader Full Name *</label>
+                                <input type="text" id="genReaderName" required placeholder="e.g. Ken Patel">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="genReaderEmail">Email Address (Validated via Regex) *</label>
+                                <input type="email" id="genReaderEmail" required placeholder="e.g. ken@library.edu">
+                                <small style="font-size: 0.72rem; color: var(--text-muted);">Enforces Day 1 regex validation</small>
+                            </div>
+
+                            <div class="form-group">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                                    <label for="genReaderId" style="margin-bottom: 0;">Reader ID (Unique)</label>
+                                    <button type="button" class="btn btn-outline btn-sm" id="btnAutoGenerateId" style="padding: 0.15rem 0.5rem; font-size: 0.72rem;">🎲 Auto-ID</button>
+                                </div>
+                                <input type="text" id="genReaderId" placeholder="e.g. RDR-4091 (leave empty to auto-generate)">
+                            </div>
+
+                            <div class="form-group">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                                    <label for="genReaderPassword" style="margin-bottom: 0;">Password (Min. 6 chars) *</label>
+                                    <button type="button" class="btn btn-outline btn-sm" id="btnAutoGeneratePass" style="padding: 0.15rem 0.5rem; font-size: 0.72rem;">⚡ Gen Pass</button>
+                                </div>
+                                <input type="text" id="genReaderPassword" required placeholder="Min 6 characters (e.g. read@2026)">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block" id="btnSubmitGenerateReader">
+                                ✨ Generate & Activate Reader Account
+                            </button>
+                        </form>
+
+                        <!-- Generated Credential Box -->
+                        <div class="cred-card hidden" id="generatedCredBox">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong style="color: #064e3b; font-size: 0.9rem;">✅ Account Activated!</strong>
+                                <button type="button" class="btn btn-outline btn-sm" id="btnCopyCreds" style="padding: 0.2rem 0.6rem; font-size: 0.75rem;">📋 Copy Credentials</button>
+                            </div>
+                            <div class="cred-row">
+                                <span class="cred-label">Reader ID:</span>
+                                <span class="cred-val" id="dispGenId">RDR-1001</span>
+                            </div>
+                            <div class="cred-row">
+                                <span class="cred-label">Reader Name:</span>
+                                <span class="cred-val" id="dispGenName">Ken</span>
+                            </div>
+                            <div class="cred-row">
+                                <span class="cred-label">Email:</span>
+                                <span class="cred-val" id="dispGenEmail">ken@library.edu</span>
+                            </div>
+                            <div class="cred-row">
+                                <span class="cred-label">Password:</span>
+                                <span class="cred-val" id="dispGenPass">pass123</span>
+                            </div>
+                            <small style="color: #166534; font-size: 0.75rem; margin-top: 0.35rem;">
+                                This user can now immediately log in via the Sign In modal or profile switcher!
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Issued Readers List -->
+                    <div class="panel-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <div>
+                                <h3 class="panel-title" style="margin-bottom: 0;">Issued Reader Credentials</h3>
+                                <p style="font-size: 0.8rem; color: var(--text-muted);">All readers registered by the Admin</p>
+                            </div>
+                            <span class="badge badge-info" id="adminReaderCount">0 Readers</span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Reader ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Password</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminReadersTbody">
+                                    <!-- Injected via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Subtab 2: Inventory Management -->
+            <div id="adminInventoryTab" class="admin-subtab-content">
+                <div class="panel-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                        <div>
+                            <h3 class="panel-title" style="margin-bottom: 0;">Book Catalog & Stock Control</h3>
+                            <p style="font-size: 0.82rem; color: var(--text-muted);">Manage physical copies, digital links, and audiobook narration files</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm" id="adminAddNewBookBtn">+ Add New Book</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Book ID</th>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Genre</th>
+                                    <th>Format</th>
+                                    <th>Rental Rate</th>
+                                    <th>Buy Price</th>
+                                    <th>Copies</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminInventoryTbody">
+                                <!-- Injected via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Subtab 3: Audit Trail & Sales -->
+            <div id="adminAuditTab" class="admin-subtab-content">
+                <div class="panel-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+                        <div>
+                            <h3 class="panel-title" style="margin-bottom: 0;">Transactions & Sales Audit Trail</h3>
+                            <span class="badge badge-info" id="adminTxCount" style="margin-top: 0.35rem;">0 Transactions</span>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="adminTxSearchInput" placeholder="Filter borrower / title..." style="padding: 0.4rem 0.75rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); font-size: 0.84rem;">
+                            <select id="adminTxTypeFilter" style="padding: 0.4rem 0.75rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); font-size: 0.84rem;">
+                                <option value="ALL">All Types (Rent & Buy)</option>
+                                <option value="RENT">Rentals Only</option>
+                                <option value="BUY">Purchases Only</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Tx ID</th>
+                                    <th>Borrower / Buyer</th>
+                                    <th>Book Title</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Due Date</th>
+                                    <th>Paid</th>
+                                    <th>Fine</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminTxTbody">
+                                <!-- Injected via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Subtab 4: Reservations Queue -->
+            <div id="adminReservationsTab" class="admin-subtab-content">
+                <div class="panel-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                        <div>
+                            <h3 class="panel-title" style="margin-bottom: 0;">FIFO Book Reservation Queues</h3>
+                            <p style="font-size: 0.82rem; color: var(--text-muted);">Queue position determines order of allocation when a borrowed book is returned</p>
+                        </div>
+                        <span class="badge badge-info" id="adminResCount">0 Reservations</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Res ID</th>
+                                    <th>Reader User ID</th>
+                                    <th>Book ID & Title</th>
+                                    <th>Queue Pos</th>
+                                    <th>Reserved Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminResTbody">
+                                <!-- Injected via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===================================================================
+         MODALS
+         =================================================================== -->
+
+    <!-- 1. Interactive Rent / Borrow Modal with Duration Slider -->
+    <div class="modal-overlay hidden" id="borrowModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3>Rent / Borrow Book</h3>
+                    <p class="modal-sub">Dynamic Polymorphic Fee Calculator</p>
+                </div>
+                <button class="btn-close" id="closeBorrowModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.25rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                        <span class="book-type-badge type-physical" id="borrowModalType">PHYSICAL</span>
+                        <span style="font-size: 0.82rem; font-weight: 700; color: var(--color-primary);" id="borrowModalRatePreview">₹20.00 / day</span>
+                    </div>
+                    <h4 id="borrowModalTitle" style="font-size: 1.05rem; color: var(--text-main); margin-bottom: 0.2rem;">Book Title</h4>
+                    <p id="borrowModalAuthor" style="font-size: 0.82rem; color: var(--text-muted);">Author</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Borrower Account</label>
+                    <input type="text" id="borrowUserIdInput" readonly class="input-readonly">
+                </div>
+
+                <!-- Interactive Duration Slider -->
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label style="margin-bottom: 0;">Rental Duration (Days)</label>
+                        <span class="slider-val-badge" id="borrowSliderDisplay">7 Days</span>
+                    </div>
+                    <input type="range" id="borrowDurationSlider" min="1" max="30" value="7" class="range-slider">
+                </div>
+
+                <!-- Quick Presets -->
+                <div class="form-group">
+                    <label>Quick Presets</label>
+                    <div class="duration-selector">
+                        <button type="button" class="duration-btn" data-days="3">3 Days</button>
+                        <button type="button" class="duration-btn active" data-days="7">7 Days</button>
+                        <button type="button" class="duration-btn" data-days="14">14 Days</button>
+                        <button type="button" class="duration-btn" data-days="30">30 Days</button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Calculation Box -->
+                <div class="calculation-box">
+                    <div class="calc-row">
+                        <span>Daily Rental Rate:</span>
+                        <span id="calcDailyRate">₹20.00</span>
+                    </div>
+                    <div class="calc-row">
+                        <span>Loan Period:</span>
+                        <span id="calcDuration">7 days</span>
+                    </div>
+                    <div class="calc-row">
+                        <span>Calculated Due Date:</span>
+                        <strong id="calcDueDate" style="color: var(--text-main);">2026-09-30</strong>
+                    </div>
+                    <div class="calc-divider"></div>
+                    <div class="calc-row calc-total">
+                        <span>Total Payable Rental:</span>
+                        <span id="calcTotal" style="color: var(--color-primary);">₹140.00</span>
+                    </div>
+                    <div class="calc-formula-note" id="calcFormulaNote">
+                        Polymorphism: Book.getRentalPrice(7) -> 7 × ₹20.00 = ₹140.00
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelBorrowBtn">Cancel</button>
+                <button class="btn btn-primary" id="confirmBorrowBtn">Confirm & Borrow</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Buy Book Modal (Day 4: Buy Flow) -->
+    <div class="modal-overlay hidden" id="buyModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3>Purchase Book Permanently</h3>
+                    <p class="modal-sub">Day 4: Instant Purchase & Ownership Flow</p>
+                </div>
+                <button class="btn-close" id="closeBuyModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="background: #f0fdf4; border: 1.5px solid #a7f3d0; border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                        <span class="badge badge-success">PERMANENT PURCHASE</span>
+                        <span style="font-size: 1.2rem; font-weight: 800; color: #059669;" id="buyModalPrice">₹599.00</span>
+                    </div>
+                    <h4 id="buyModalTitle" style="font-size: 1.1rem; color: #064e3b; margin-bottom: 0.2rem;">Book Title</h4>
+                    <p id="buyModalAuthor" style="font-size: 0.85rem; color: #166534;">Author</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Purchasing Account</label>
+                    <input type="text" id="buyUserIdInput" readonly class="input-readonly">
+                </div>
+
+                <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5;">
+                    <p>✅ <strong>Permanent Ownership:</strong> No return date or overdue late fines apply.</p>
+                    <p style="margin-top: 0.35rem;">📦 Instant deduction from available library stock.</p>
+                    <p style="margin-top: 0.35rem;">📄 Digital E-Books and AudioBooks grant immediate, perpetual offline access.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelBuyBtn">Cancel</button>
+                <button class="btn btn-success" id="confirmBuyBtn">💳 Pay & Buy Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Add / Edit Book Modal (Supports Physical, E-Book, AudioBook) -->
+    <div class="modal-overlay hidden" id="bookModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3 id="bookModalTitle">Add New Book</h3>
+                    <p class="modal-sub">Physical, Digital E-Book, or AudioBook format</p>
+                </div>
+                <button class="btn-close" id="closeBookModalBtn">&times;</button>
+            </div>
+            <form id="bookForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="bookIdInput">Book ID (Unique Identifier) *</label>
+                        <input type="text" id="bookIdInput" required placeholder="e.g. B106, E205, or A303">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bookTitleInput">Book Title *</label>
+                        <input type="text" id="bookTitleInput" required placeholder="e.g. Designing Data-Intensive Applications">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bookAuthorInput">Author *</label>
+                        <input type="text" id="bookAuthorInput" required placeholder="e.g. Martin Kleppmann">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bookGenreInput">Genre / Category *</label>
+                        <input type="text" id="bookGenreInput" required placeholder="e.g. Computer Science, Self-Help, Fiction">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bookTypeSelect">Book Format (Polymorphic Model) *</label>
+                        <select id="bookTypeSelect" required>
+                            <option value="PHYSICAL">Physical Book (₹20/day rental + shelf)</option>
+                            <option value="EBOOK">Digital E-Book (₹10/day rental + PDF)</option>
+                            <option value="AUDIOBOOK">AudioBook (₹15/day rental + Narrator)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bookBuyPriceInput">Purchase Price (₹ Buy Flow) *</label>
+                        <input type="number" id="bookBuyPriceInput" required value="499" min="10" step="1">
+                    </div>
+
+                    <div class="form-group" id="shelfGroup">
+                        <label for="shelfInput">Physical Shelf Number</label>
+                        <input type="number" id="shelfInput" value="106" min="1" max="999">
+                    </div>
+
+                    <div class="form-group hidden" id="linkGroup">
+                        <label for="linkInput">Digital PDF / Access Link</label>
+                        <input type="url" id="linkInput" placeholder="https://library.edu/ebooks/book.pdf">
+                    </div>
+
+                    <!-- AudioBook Specific Fields -->
+                    <div class="form-group hidden" id="audioNarratorGroup">
+                        <label for="audioNarratorInput">Narrator Voice *</label>
+                        <input type="text" id="audioNarratorInput" placeholder="e.g. Stephen Fry or James Clear">
+                    </div>
+
+                    <div class="form-group hidden" id="audioDurationGroup">
+                        <label for="audioDurationInput">Duration (Minutes)</label>
+                        <input type="number" id="audioDurationInput" value="300" min="1">
+                    </div>
+
+                    <div class="form-group hidden" id="audioUrlGroup">
+                        <label for="audioUrlInput">Audio Stream Preview URL</label>
+                        <input type="url" id="audioUrlInput" placeholder="https://library.edu/audio/preview.mp3">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" id="cancelBookBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveBookBtn">Save to Catalog</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. AudioBook Player Modal (Day 1 Syllabus AudioBook Feature) -->
+    <div class="modal-overlay hidden" id="audioPlayerModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3>🎧 AudioBook Player</h3>
+                    <p class="modal-sub">Digital Accessible Audio Stream</p>
+                </div>
+                <button class="btn-close" id="closeAudioPlayerBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="audio-player-box">
+                    <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">🎙️</div>
+                    <h4 id="audioModalTitle" style="font-size: 1.15rem; color: #4c1d95; margin-bottom: 0.25rem;">Book Title</h4>
+                    <p id="audioModalAuthor" style="font-size: 0.85rem; color: #6d28d9;">by Author</p>
+                    <div style="margin-top: 0.5rem; font-size: 0.8rem; font-weight: 600; color: #5b21b6;" id="audioModalNarrator">
+                        Narrated by James Clear (320 mins)
+                    </div>
+
+                    <div class="soundwave-anim">
+                        <div class="sound-bar"></div>
+                        <div class="sound-bar"></div>
+                        <div class="sound-bar"></div>
+                        <div class="sound-bar"></div>
+                        <div class="sound-bar"></div>
+                    </div>
+
+                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        Playing preview sample • High-definition stereo
+                    </div>
+                </div>
+
+                <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1rem; font-size: 0.84rem; color: var(--text-secondary);">
+                    <p>💡 <strong>Digital Accessible Feature:</strong> AudioBooks implement <code>DigitalAccessible</code> interface, streaming directly without physical inventory constraints.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary btn-block" id="closeAudioPlayerFooterBtn">Close Player</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Digital E-Book Reader Modal -->
+    <div class="modal-overlay hidden" id="ebookReaderModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3 id="readerModalTitle">E-Book Reader</h3>
+                    <p class="modal-sub" id="readerModalAuthor">by Author</p>
+                </div>
+                <button class="btn-close" id="closeEbookReaderBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span class="badge badge-info">DIGITAL ACCESS</span>
+                    <a href="#" target="_blank" id="readerDirectDownloadLink" class="btn btn-primary btn-sm">
+                        📥 Download Full PDF
+                    </a>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem; font-size: 0.88rem; line-height: 1.6; color: var(--text-secondary);">
+                    <div style="font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;">Chapter 1: Principles of Object-Oriented Architecture</div>
+                    <p>
+                        Welcome to the digital edition. In this volume, we examine foundational principles of modular design, polymorphism, and dynamic late-binding. Abstraction shields the system from implementation details, allowing interchangeable persistence mechanisms (In-Memory or MySQL) without affecting business services.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline btn-block" id="closeReaderFooterBtn">Close Reader</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Auth / Sign In Modal (Strict Account Architecture: Admin or Admin-issued Reader) -->
+    <div class="modal-overlay hidden" id="authModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3>Sign In to Smart Library</h3>
+                    <p class="modal-sub">Admin or Admin-Generated Reader Profile</p>
+                </div>
+                <button class="btn-close" id="closeAuthModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="background: #eff6ff; border: 1px solid var(--color-primary-border); border-radius: var(--radius-md); padding: 0.9rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #1e40af;">
+                    <strong>ℹ️ Account Architecture:</strong><br>
+                    • <strong>Admin:</strong> Use <code>admin</code> / <code>admin123</code> to access the Admin Panel.<br>
+                    • <strong>Reader:</strong> Use the Reader ID and password generated by the Admin in the Admin Panel.
+                </div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginUserId">User ID *</label>
+                        <input type="text" id="loginUserId" required placeholder="e.g. admin or RDR-4091">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password *</label>
+                        <input type="password" id="loginPassword" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" style="margin-top: 0.75rem;">Sign In</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. Return Receipt & Overdue Fee Modal (with FIFO Queue Allocation alert) -->
+    <div class="modal-overlay hidden" id="receiptModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3>Official Return Receipt</h3>
+                    <p class="modal-sub">Transaction Completed & Verified</p>
+                </div>
+                <button class="btn-close" id="closeReceiptModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="receiptContent">
+                    <!-- Populated dynamically via JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary btn-block" id="closeReceiptBtn">Done & Refresh</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
