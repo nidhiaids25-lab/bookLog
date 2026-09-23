@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Library System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #1a73e8;
+            margin-bottom: 10px;
+        }
+        .btn-fetch {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-fetch:hover {
+            background-color: #1557b0;
+        }
+        /* Cards Layout */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .book-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-left: 5px solid #1a73e8;
+        }
+        .book-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin: 0 0 8px 0;
+        }
+        .book-author {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background-color: #e8f0fe;
+            color: #1a73e8;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .book-info {
+            font-size: 14px;
+            color: #444;
+            margin: 5px 0;
+        }
+        .btn-download {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 12px;
+            background-color: #34a853;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .btn-download:hover {
+            background-color: #2d8e47;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>📚 Smart Library Management</h1>
+        <button class="btn-fetch" onclick="loadBooks()">Show All Books</button>
+    </div>
+
+    <div id="books-container" class="books-grid">
+        <!-- Books yahan cards ke roop mein dikhenge -->
+    </div>
+
+    <script>
+        function loadBooks() {
+            fetch('http://localhost:8080/api/books')
+                .then(response => response.json())
+                .then(books => {
+                    const container = document.getElementById('books-container');
+                    container.innerHTML = ''; // Pehle ka content clear karne ke liye
+
+                    books.forEach(book => {
+                        const cardHtml = `
+                            <div class="book-card">
+                                <h3 class="book-title">${book.title}</h3>
+                                <div class="book-author">By ${book.author}</div>
+                                <span class="badge">${book.genre}</span>
+                                
+                                <div class="book-info"><strong>Book ID:</strong> ${book.bookId}</div>
+                                <div class="book-info"><strong>Price:</strong> ₹${book.buyPrice}</div>
+                                <div class="book-info"><strong>Available Copies:</strong> ${book.availableCopies} / ${book.totalCopies}</div>
+                                
+                                ${book.downloadLink ? `<a href="${book.downloadLink}" target="_blank" class="btn-download">📖 Download E-Book</a>` : ''}
+                            </div>
+                        `;
+                        container.innerHTML += cardHtml;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Backend se data nahi mil pa raha hai!');
+                });
+        }
+    </script>
+
+</body>
+</html>
