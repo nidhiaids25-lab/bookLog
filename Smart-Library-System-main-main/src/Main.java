@@ -99,5 +99,6 @@ public class Main {
                 System.out.println("Unknown command: '" + line + "'. Type 'help' for options.");
             }
         }
+        scanner.close();
     }
 }
